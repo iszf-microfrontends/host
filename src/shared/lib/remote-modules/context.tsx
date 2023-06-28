@@ -36,10 +36,10 @@ export function RemoteModulesProvider({ children }: RemoteModulesProviderProps):
     await time.delay(2000);
     setRemoteModules([
       {
-        name: 'MICROFRONTEND_1',
+        name: 'TEST',
         url: 'http://localhost:5053',
         component: 'Main',
-        path: 'MICROFRONTEND_1'.toLowerCase(),
+        path: 'TEST'.toLowerCase(),
       },
     ]);
     setStatus(Status.DONE);
