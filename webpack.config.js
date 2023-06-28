@@ -1,17 +1,19 @@
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
-const path = require("path");
-const { dependencies } = require("./package.json");
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-var-requires */
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const path = require('path');
+const { dependencies } = require('./package.json');
 
 module.exports = (env) => {
   const isDev = !!env.dev;
 
   return {
-    mode: isDev ? "development" : "production",
+    mode: isDev ? 'development' : 'production',
     devServer: {
-      compress: true,
-      port: 9000,
+      historyApiFallback: true,
+      port: 5050,
     },
     module: {
       rules: [
@@ -20,7 +22,7 @@ module.exports = (env) => {
           exclude: /node_modules/,
           use: [
             {
-              loader: "babel-loader",
+              loader: 'babel-loader',
             },
           ],
         },
@@ -29,7 +31,7 @@ module.exports = (env) => {
           exclude: /node_modules/,
           use: [
             {
-              loader: "ts-loader",
+              loader: 'ts-loader',
             },
           ],
         },
@@ -37,21 +39,32 @@ module.exports = (env) => {
     },
     plugins: [
       new ModuleFederationPlugin({
-        name: "Host",
+        name: 'HOST',
         remotes: {},
         shared: {
           ...dependencies,
-          react: { singleton: true },
-          "react-dom": { singleton: true },
+          react: {
+            eager: true,
+            singleton: true,
+            requiredVersion: dependencies['react'],
+          },
+          'react-dom': {
+            eager: true,
+            singleton: true,
+            requiredVersion: dependencies['react-dom'],
+          },
         },
       }),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, "./public/index.html"),
+        template: path.resolve(__dirname, './public/index.html'),
       }),
       isDev && new ReactRefreshWebpackPlugin(),
     ].filter(Boolean),
     resolve: {
-      extensions: [".js", ".jsx", ".ts", ".tsx"],
+      alias: {
+        '~': path.resolve(__dirname, 'src'),
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
   };
 };
