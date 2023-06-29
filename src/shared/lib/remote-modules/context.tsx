@@ -42,11 +42,11 @@ export function RemoteModulesProvider({ children }: RemoteModulesProviderProps):
     await time.delay(2000);
 
     try {
-      const response = await fetch(`${env.MICROFRONTEND_CONTROL_SERVER_URL}/started-microfrontends`);
+      const response = await fetch(`${env.MICROFRONTEND_CONTROL_SERVER_URL}/api/v1/microfrontends/all`);
       const fetchedRemoteModules = (await response.json()) as RemoteModuleDto[];
       setRemoteModules(fetchedRemoteModules.map((module) => ({ ...module, path: module.name.toLowerCase() })));
     } catch (error) {
-      console.error(`Failed connect to microfrontend-control-server: ${error}`);
+      console.error(`Failed to connect Microfrontend control server: ${error}`);
     }
 
     setStatus(Status.DONE);
