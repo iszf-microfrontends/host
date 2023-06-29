@@ -1,5 +1,7 @@
 import { createContext, ReactNode, useCallback, useMemo, useState } from 'react';
 
+import { env } from '~/shared/config';
+
 import { time } from '..';
 
 type RemoteModuleDto = {
@@ -39,10 +41,14 @@ export function RemoteModulesProvider({ children }: RemoteModulesProviderProps):
 
     await time.delay(2000);
 
-    const response = await fetch('http://localhost:3000/started-microfrontends');
-    const fetchedRemoteModules = (await response.json()) as RemoteModuleDto[];
+    try {
+      const response = await fetch(`${env.MICROFRONTEND_CONTROL_SERVER_URL}/started-microfrontends`);
+      const fetchedRemoteModules = (await response.json()) as RemoteModuleDto[];
+      setRemoteModules(fetchedRemoteModules.map((module) => ({ ...module, path: module.name.toLowerCase() })));
+    } catch (error) {
+      console.error(`Failed connect to microfrontend-control-server: ${error}`);
+    }
 
-    setRemoteModules(fetchedRemoteModules.map((module) => ({ ...module, path: module.name.toLowerCase() })));
     setStatus(Status.DONE);
   }, []);
 

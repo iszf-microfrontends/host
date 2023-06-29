@@ -3,6 +3,7 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const path = require('path');
 const { dependencies } = require('./package.json');
+const Dotenv = require('dotenv-webpack');
 
 const resolveRoot = (...segments) => path.resolve(__dirname, ...segments);
 
@@ -45,6 +46,9 @@ module.exports = (env) => {
       ],
     },
     plugins: [
+      new Dotenv({
+        path: resolveRoot(`.env.${isDev ? 'dev' : 'prod'}`),
+      }),
       new ModuleFederationPlugin({
         name: 'HOST',
         remotes: {},

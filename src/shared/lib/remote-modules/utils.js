@@ -1,6 +1,6 @@
 import { time } from '..';
 
-export const fetchRemote = (url, remote) =>
+const fetchRemote = (url, remote) =>
   new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = url;
