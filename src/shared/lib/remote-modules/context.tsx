@@ -2,15 +2,18 @@ import { createContext, ReactNode, useCallback, useMemo, useState } from 'react'
 
 import { time } from '..';
 
-interface IRemoteModule {
+type RemoteModuleDto = {
   name: string;
   url: string;
   component: string;
+};
+
+type RemoteModule = RemoteModuleDto & {
   path: string;
-}
+};
 
 type RemoteModulesContextType = {
-  remoteModules: IRemoteModule[];
+  remoteModules: RemoteModule[];
   loadRemoteModules: () => Promise<void>;
   isPending: boolean;
 };
@@ -28,20 +31,18 @@ enum Status {
 }
 
 export function RemoteModulesProvider({ children }: RemoteModulesProviderProps): JSX.Element | null {
-  const [remoteModules, setRemoteModules] = useState<IRemoteModule[]>([]);
+  const [remoteModules, setRemoteModules] = useState<RemoteModule[]>([]);
   const [status, setStatus] = useState<Status>(Status.INITIAL);
 
   const loadRemoteModules = useCallback(async () => {
     setStatus(Status.PENDING);
+
     await time.delay(2000);
-    setRemoteModules([
-      {
-        name: 'TEST',
-        url: 'http://localhost:5053',
-        component: 'Main',
-        path: 'TEST'.toLowerCase(),
-      },
-    ]);
+
+    const response = await fetch('http://localhost:3000/started-microfrontends');
+    const fetchedRemoteModules = (await response.json()) as RemoteModuleDto[];
+
+    setRemoteModules(fetchedRemoteModules.map((module) => ({ ...module, path: module.name.toLowerCase() })));
     setStatus(Status.DONE);
   }, []);
 

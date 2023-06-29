@@ -21,5 +21,6 @@
       "~/*": ["src/*"]
     }
   },
-  "include": ["src", "webpack.config.js"]
+  "include": ["src", "webpack.config.js"],
+  "exclude": ["node_modules"]
 }

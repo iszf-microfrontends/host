@@ -1,16 +1,22 @@
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-var-requires */
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const path = require('path');
 const { dependencies } = require('./package.json');
 
+const resolveRoot = (...segments) => path.resolve(__dirname, ...segments);
+
 module.exports = (env) => {
   const isDev = !!env.dev;
 
+  const babelOptions = {
+    presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
+    plugins: ['@babel/plugin-transform-runtime', '@emotion', isDev && require.resolve('react-refresh/babel')].filter(Boolean),
+  };
+
   return {
     mode: isDev ? 'development' : 'production',
+    devtool: isDev && 'inline-source-map',
     devServer: {
       historyApiFallback: true,
       port: 5050,
@@ -22,7 +28,8 @@ module.exports = (env) => {
           exclude: /node_modules/,
           use: [
             {
-              loader: 'babel-loader',
+              loader: require.resolve('babel-loader'),
+              options: babelOptions,
             },
           ],
         },
@@ -31,7 +38,7 @@ module.exports = (env) => {
           exclude: /node_modules/,
           use: [
             {
-              loader: 'ts-loader',
+              loader: require.resolve('ts-loader'),
             },
           ],
         },
@@ -56,13 +63,13 @@ module.exports = (env) => {
         },
       }),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, './public/index.html'),
+        template: resolveRoot('public/index.html'),
       }),
       isDev && new ReactRefreshWebpackPlugin(),
     ].filter(Boolean),
     resolve: {
       alias: {
-        '~': path.resolve(__dirname, 'src'),
+        '~': resolveRoot('src'),
       },
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },

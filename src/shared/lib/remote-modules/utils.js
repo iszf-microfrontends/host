@@ -1,6 +1,5 @@
 import { time } from '..';
 
-/* eslint-disable no-undef */
 export const fetchRemote = (url, remote) =>
   new Promise((resolve, reject) => {
     const script = document.createElement('script');
