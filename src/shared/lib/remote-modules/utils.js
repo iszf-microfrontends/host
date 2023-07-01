@@ -31,9 +31,8 @@ const fetchRemote = (url, remote) =>
 export const loadComponent =
   (remote, url, module, scope = 'default') =>
   async () => {
-    await time.delay(2000);
-
     if (!(remote in window)) {
+      await time.delay(2000);
       await __webpack_init_sharing__(scope);
       const fetchedContainer = await fetchRemote(`${url}/remoteEntry.js`, remote);
       await fetchedContainer.init(__webpack_share_scopes__[scope]);
