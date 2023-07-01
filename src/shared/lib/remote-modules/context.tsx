@@ -8,9 +8,10 @@ type RemoteModuleDto = {
   name: string;
   url: string;
   component: string;
+  isBackendActive: boolean;
 };
 
-type RemoteModule = RemoteModuleDto & {
+export type RemoteModule = RemoteModuleDto & {
   path: string;
 };
 

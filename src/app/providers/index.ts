@@ -4,4 +4,4 @@ import { withMantine } from './with-mantine';
 import { withRemoteModules } from './with-remote-modules';
 import { withRouter } from './with-router';
 
-export const withHocs = compose(withMantine, withRouter, withRemoteModules);
+export const withProviders = compose(withMantine, withRouter, withRemoteModules);

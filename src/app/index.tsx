@@ -1,4 +1,4 @@
-import { withHocs } from './hocs';
+import { withProviders } from './providers';
 
 import { Pages } from '../pages';
 
@@ -6,4 +6,4 @@ function App(): JSX.Element | null {
   return <Pages />;
 }
 
-export const AppWithProviders = withHocs(App);
+export const AppWithProviders = withProviders(App);

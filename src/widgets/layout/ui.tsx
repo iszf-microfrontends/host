@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
-import { AppShell, createStyles, Header, Navbar, Stack, Title } from '@mantine/core';
+import { AppShell, createStyles, Header, Navbar, Stack, Text, Title, Tooltip } from '@mantine/core';
 
 import { useRemoteModules } from '~/shared/lib';
 
@@ -47,13 +47,21 @@ function Link({ to, children }: LinkProps): JSX.Element | null {
 }
 
 export function Layout(): JSX.Element | null {
+  const { classes } = useStyles();
+
   const { remoteModules, isPending } = useRemoteModules();
 
-  const remoteModuleLinks = remoteModules.map((module) => (
-    <Link key={module.name} to={module.path}>
-      {module.name}
-    </Link>
-  ));
+  const remoteModuleLinks = remoteModules.map((module) =>
+    module.isBackendActive ? (
+      <Link key={module.name} to={module.path}>
+        {module.name}
+      </Link>
+    ) : (
+      <Tooltip key={module.name} label="Backend is not active" className={classes.link}>
+        <Text>{module.name}</Text>
+      </Tooltip>
+    ),
+  );
 
   return (
     <AppShell
