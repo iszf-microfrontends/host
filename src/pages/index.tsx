@@ -13,21 +13,21 @@ export function Pages(): JSX.Element | null {
     loadRemoteModules();
   }, [loadRemoteModules]);
 
-  const renderRemoteModule = (module: RemoteModule): JSX.Element | null =>
-    module.isBackendActive ? (
+  const renderRemoteRoutes = (module: RemoteModule): JSX.Element | null =>
+    module.isActive ? (
       <Route
         key={module.name}
         path={module.path}
-        element={<RemoteComponent remote={module.name} url={module.url} component={module.component} />}
+        element={<RemoteComponent url={module.url} scope={module.scope} component={module.component} fallback={<div>Загрузка...</div>} />}
       />
     ) : null;
 
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<Title>Home</Title>} />
+        <Route index element={<Title>Главная</Title>} />
         <Route path="*" element={<Navigate to="/" replace />} />
-        {remoteModules.map(renderRemoteModule)}
+        {remoteModules.map(renderRemoteRoutes)}
       </Route>
     </Routes>
   );

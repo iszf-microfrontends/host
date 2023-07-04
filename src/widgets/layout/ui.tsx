@@ -31,34 +31,19 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-type LinkProps = {
-  to: string;
-  children: ReactNode;
-};
-
-function Link({ to, children }: LinkProps): JSX.Element | null {
-  const { classes, cx } = useStyles();
-
-  return (
-    <NavLink to={to} className={({ isActive }) => cx(classes.link, { [classes.linkActive]: isActive })}>
-      {children}
-    </NavLink>
-  );
-}
-
 export function Layout(): JSX.Element | null {
   const { classes } = useStyles();
 
   const { remoteModules, isPending } = useRemoteModules();
 
   const remoteModuleLinks = remoteModules.map((module) =>
-    module.isBackendActive ? (
+    module.isActive ? (
       <Link key={module.name} to={module.path}>
         {module.name}
       </Link>
     ) : (
-      <Tooltip key={module.name} label="Backend is not active" className={classes.link}>
-        <Text>{module.name}</Text>
+      <Tooltip key={module.name} label="Сервис временно не доступен">
+        <Text className={classes.link}>{module.name}</Text>
       </Tooltip>
     ),
   );
@@ -69,8 +54,8 @@ export function Layout(): JSX.Element | null {
       navbar={
         <Navbar width={{ base: 300 }} height="100%" p="md">
           <Stack spacing="xs">
-            <Link to="/">Home</Link>
-            {isPending ? <div>Loading...</div> : remoteModuleLinks}
+            <Link to="/">Главная</Link>
+            {isPending ? <div>Загрузка...</div> : remoteModuleLinks}
           </Stack>
         </Navbar>
       }
@@ -83,7 +68,7 @@ export function Layout(): JSX.Element | null {
             alignItems: 'center',
           }}
         >
-          <Title>Header</Title>
+          <Title></Title>
         </Header>
       }
       styles={(theme) => ({
@@ -95,5 +80,20 @@ export function Layout(): JSX.Element | null {
     >
       <Outlet />
     </AppShell>
+  );
+}
+
+type LinkProps = {
+  to: string;
+  children: ReactNode;
+};
+
+function Link({ to, children }: LinkProps): JSX.Element | null {
+  const { classes, cx } = useStyles();
+
+  return (
+    <NavLink to={to} className={({ isActive }) => cx(classes.link, { [classes.linkActive]: isActive })}>
+      {children}
+    </NavLink>
   );
 }

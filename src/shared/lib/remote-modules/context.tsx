@@ -2,13 +2,12 @@ import { createContext, ReactNode, useCallback, useMemo, useState } from 'react'
 
 import { env } from '~/shared/config';
 
-import { time } from '..';
-
 type RemoteModuleDto = {
   name: string;
   url: string;
+  scope: string;
   component: string;
-  isBackendActive: boolean;
+  isActive: boolean;
 };
 
 export type RemoteModule = RemoteModuleDto & {
@@ -40,12 +39,11 @@ export function RemoteModulesProvider({ children }: RemoteModulesProviderProps):
   const loadRemoteModules = useCallback(async () => {
     setStatus(Status.PENDING);
 
-    await time.delay(2000);
-
     try {
       const response = await fetch(`${env.MICROFRONTEND_CONTROL_SERVER_URL}/api/v1/microfrontends/all`);
-      const fetchedRemoteModules = (await response.json()) as RemoteModuleDto[];
-      setRemoteModules(fetchedRemoteModules.map((module) => ({ ...module, path: module.name.toLowerCase() })));
+      const data = (await response.json()) as RemoteModuleDto[];
+      const loadedRemoteModules = data.map((module) => ({ ...module, path: module.name.toLowerCase() }));
+      setRemoteModules(loadedRemoteModules);
     } catch (error) {
       console.error(`Failed to connect Microfrontend control server: ${error}`);
     }

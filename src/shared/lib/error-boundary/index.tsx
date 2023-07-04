@@ -18,12 +18,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error('ErrorBoundary caught error:', error, errorInfo);
   }
 
   public render() {
     if (this.state.hasError) {
-      return <div>Sorry... something went wrong</div>;
+      return <div>Упс... Что то пошло не так &#9785;&#65039;</div>;
     }
 
     return this.props.children;

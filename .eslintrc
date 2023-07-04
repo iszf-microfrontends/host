@@ -18,10 +18,9 @@
     "plugin:import/typescript",
     "plugin:prettier/recommended"
   ],
-  "plugins": ["react-refresh", "simple-import-sort"],
+  "plugins": ["simple-import-sort"],
   "ignorePatterns": ["*.js"],
   "rules": {
-    "react-refresh/only-export-components": "warn",
     "react/react-in-jsx-scope": "off",
     "react/function-component-definition": [
       "error",

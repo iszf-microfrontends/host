@@ -1,37 +1,45 @@
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 const path = require('path');
-const { dependencies: deps } = require('./package.json');
 const dotenv = require('dotenv');
-const webpack = require('webpack');
-
-const resolveRoot = (...segments) => path.resolve(__dirname, ...segments);
+const { dependencies } = require('./package.json');
 
 const defaultEnvFile = dotenv.config();
 
 module.exports = (env) => {
   const isDev = !!env.dev;
 
-  const modeEnvFile = dotenv.config({
-    path: resolveRoot(`.env.${isDev ? 'dev' : 'prod'}`),
-  });
+  const modeEnvFile = dotenv.config({ path: resolveRoot(`.env.${isDev ? 'dev' : 'prod'}`) });
   const parsedEnv = { ...defaultEnvFile.parsed, ...modeEnvFile.parsed };
 
   const babelOptions = {
     presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
-    plugins: ['@babel/plugin-transform-runtime', '@emotion', isDev && 'react-refresh/babel'].filter(Boolean),
+    plugins: ['@babel/plugin-transform-runtime', '@emotion'],
   };
 
+  const devPlugins = [];
+  if (isDev) {
+    devPlugins.push(new LiveReloadPlugin());
+  }
+
   return {
+    entry: resolveRoot('src/index'),
     mode: isDev ? 'development' : 'production',
     devtool: isDev && 'inline-source-map',
     output: {
+      publicPath: 'auto',
       clean: true,
     },
     devServer: {
-      historyApiFallback: true,
       port: parsedEnv.PORT,
+      static: resolveRoot('dist'),
+      historyApiFallback: {
+        index: 'index.html',
+      },
+      hot: false,
     },
     module: {
       rules: [
@@ -57,19 +65,13 @@ module.exports = (env) => {
       ],
     },
     plugins: [
+      new NodePolyfillPlugin(),
       new ModuleFederationPlugin({
         name: 'HOST',
         remotes: {},
         shared: {
-          ...deps,
-          react: {
-            singleton: true,
-            requiredVersion: deps['react'],
-          },
-          'react-dom': {
-            singleton: true,
-            requiredVersion: deps['react-dom'],
-          },
+          ...dependencies,
+          ...singletonDeps('react', 'react-dom', '@emotion/react', '@mantine/core', '@mantine/hooks'),
         },
       }),
       new HtmlWebpackPlugin({
@@ -78,8 +80,8 @@ module.exports = (env) => {
       new webpack.DefinePlugin({
         'process.env': JSON.stringify(parsedEnv),
       }),
-      isDev && new ReactRefreshWebpackPlugin(),
-    ].filter(Boolean),
+      ...devPlugins,
+    ],
     resolve: {
       alias: {
         '~': resolveRoot('src'),
@@ -88,3 +90,17 @@ module.exports = (env) => {
     },
   };
 };
+
+function resolveRoot(...segments) {
+  return path.resolve(__dirname, ...segments);
+}
+
+function singletonDeps(...deps) {
+  return deps.reduce((depsObj, dep) => {
+    depsObj[dep] = {
+      singleton: true,
+      requiredVersion: dependencies[dep],
+    };
+    return depsObj;
+  }, {});
+}

@@ -1,23 +1,33 @@
-import { lazy, ReactNode, Suspense } from 'react';
+import { ComponentType, lazy, ReactNode, Suspense, useMemo } from 'react';
 
-import { loadComponent } from './utils';
+import { importRemote } from '@module-federation/utilities';
 
 import { ErrorBoundary } from '../error-boundary';
 
 type RemoteComponentProps = {
-  remote: string;
   url: string;
+  scope: string;
   component: string;
   fallback?: string | ReactNode;
 };
 
-export function RemoteComponent({ remote, url, component, fallback = <div>Loading...</div> }: RemoteComponentProps): JSX.Element | null {
-  const LoadedComponent = lazy(loadComponent(remote, url, `./${component}`));
+export function RemoteComponent({ url, scope, component, fallback }: RemoteComponentProps): JSX.Element | null {
+  const Component = useMemo(
+    () =>
+      lazy(() =>
+        importRemote<{ default: { [component: string]: ComponentType } }>({
+          url,
+          scope,
+          module: component,
+        }).then((remote) => ({ default: remote.default[component] })),
+      ),
+    [component, scope, url],
+  );
 
   return (
     <ErrorBoundary>
       <Suspense fallback={fallback}>
-        <LoadedComponent />
+        <Component />
       </Suspense>
     </ErrorBoundary>
   );
