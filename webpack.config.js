@@ -71,7 +71,7 @@ module.exports = (env) => {
         remotes: {},
         shared: {
           ...dependencies,
-          ...singletonDeps('react', 'react-dom', '@emotion/react', '@mantine/core', '@mantine/hooks'),
+          ...singletonDeps('react', 'react-dom', '@emotion/react', '@mantine/core', '@mantine/hooks', '@mantine/notifications'),
         },
       }),
       new HtmlWebpackPlugin({

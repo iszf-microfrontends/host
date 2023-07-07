@@ -2,6 +2,8 @@ import { createContext, ReactNode, useCallback, useMemo, useState } from 'react'
 
 import { env } from '~/shared/config';
 
+import { notification } from '..';
+
 type RemoteModuleDto = {
   name: string;
   url: string;
@@ -45,7 +47,9 @@ export function RemoteModulesProvider({ children }: RemoteModulesProviderProps):
       const loadedRemoteModules = data.map((module) => ({ ...module, path: module.name.toLowerCase() }));
       setRemoteModules(loadedRemoteModules);
     } catch (error) {
+      notification.showError({ title: 'Ошибка!', message: 'Ошибка при загрузке микрофронтендов' });
       console.error(`Failed to connect Microfrontend control server: ${error}`);
+      throw error;
     }
 
     setStatus(Status.DONE);

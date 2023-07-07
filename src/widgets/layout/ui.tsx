@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
 import { AppShell, createStyles, Header, Navbar, Stack, Text, Title, Tooltip } from '@mantine/core';
@@ -36,7 +36,9 @@ export function Layout(): JSX.Element | null {
 
   const { remoteModules, isPending } = useRemoteModules();
 
-  const remoteModuleLinks = remoteModules.map((module) =>
+  const sortedRemoteModules = useMemo(() => remoteModules.sort((a, b) => Number(b.isActive) - Number(a.isActive)), [remoteModules]);
+
+  const remoteModuleLinks = sortedRemoteModules.map((module) =>
     module.isActive ? (
       <Link key={module.name} to={module.path}>
         {module.name}

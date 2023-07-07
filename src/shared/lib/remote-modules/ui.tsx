@@ -1,4 +1,4 @@
-import { ComponentType, lazy, ReactNode, Suspense, useMemo } from 'react';
+import { lazy, ReactNode, Suspense } from 'react';
 
 import { importRemote } from '@module-federation/utilities';
 
@@ -12,16 +12,12 @@ type RemoteComponentProps = {
 };
 
 export function RemoteComponent({ url, scope, component, fallback }: RemoteComponentProps): JSX.Element | null {
-  const Component = useMemo(
-    () =>
-      lazy(() =>
-        importRemote<{ default: { [component: string]: ComponentType } }>({
-          url,
-          scope,
-          module: component,
-        }).then((remote) => ({ default: remote.default[component] })),
-      ),
-    [component, scope, url],
+  const Component = lazy(() =>
+    importRemote({
+      url,
+      scope,
+      module: component,
+    }),
   );
 
   return (
