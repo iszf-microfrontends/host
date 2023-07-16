@@ -49,7 +49,6 @@ export function RemoteModulesProvider({ children }: RemoteModulesProviderProps):
     } catch (error) {
       notification.showError({ title: 'Ошибка!', message: 'Ошибка при загрузке микрофронтендов' });
       console.error(`Failed to connect Microfrontend control server: ${error}`);
-      throw error;
     }
 
     setStatus(Status.DONE);

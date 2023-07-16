@@ -3,17 +3,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
-const path = require('path');
 const dotenv = require('dotenv');
 const { dependencies } = require('./package.json');
+const { resolveRoot } = require('./server/utils');
 
-const defaultEnvFile = dotenv.config();
+const envFile = dotenv.config();
+const parsedEnv = { ...envFile.parsed };
 
 module.exports = (env) => {
   const isDev = !!env.dev;
-
-  const modeEnvFile = dotenv.config({ path: resolveRoot(`.env.${isDev ? 'dev' : 'prod'}`) });
-  const parsedEnv = { ...defaultEnvFile.parsed, ...modeEnvFile.parsed };
 
   const babelOptions = {
     presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
@@ -76,6 +74,9 @@ module.exports = (env) => {
       }),
       new HtmlWebpackPlugin({
         template: resolveRoot('public/index.html'),
+        templateParameters: {
+          IS_DEV: isDev,
+        },
       }),
       new webpack.DefinePlugin({
         'process.env': JSON.stringify(parsedEnv),
@@ -90,10 +91,6 @@ module.exports = (env) => {
     },
   };
 };
-
-function resolveRoot(...segments) {
-  return path.resolve(__dirname, ...segments);
-}
 
 function singletonDeps(...deps) {
   return deps.reduce((depsObj, dep) => {

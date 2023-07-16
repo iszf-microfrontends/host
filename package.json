@@ -6,6 +6,7 @@
   "author": "Sviatoslav <sviatoslavnazin@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "preview": "node ./server/bootstrap",
     "start": "webpack serve --env dev",
     "build": "webpack build",
     "lint": "eslint src --ext ts,tsx --fix",
@@ -51,6 +52,8 @@
     "@mantine/notifications": "^6.0.16",
     "@module-federation/utilities": "^2.0.0",
     "compose-function": "^3.0.3",
+    "express": "^4.18.2",
+    "express-history-api-fallback": "^2.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0"
