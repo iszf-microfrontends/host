@@ -6,9 +6,8 @@
   "author": "Sviatoslav <sviatoslavnazin@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "preview": "node ./server/bootstrap",
-    "start": "webpack serve --env dev",
-    "build": "webpack build",
+    "dev": "webpack serve --env dev",
+    "build": "webpack build --progress",
     "lint": "eslint src --ext ts,tsx --fix",
     "format": "prettier src --write"
   },
@@ -20,7 +19,6 @@
     "@babel/preset-typescript": "^7.22.5",
     "@emotion/babel-plugin": "^11.11.0",
     "@types/compose-function": "^0.0.30",
-    "@types/node": "^20.3.1",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "@typescript-eslint/eslint-plugin": "^5.60.1",
@@ -38,7 +36,6 @@
     "html-webpack-plugin": "^5.5.3",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "prettier": "^2.8.8",
-    "ts-loader": "^9.4.3",
     "typescript": "^5.0.4",
     "webpack": "^5.88.0",
     "webpack-cli": "^5.1.4",
@@ -52,8 +49,6 @@
     "@mantine/notifications": "^6.0.16",
     "@module-federation/utilities": "^2.0.0",
     "compose-function": "^3.0.3",
-    "express": "^4.18.2",
-    "express-history-api-fallback": "^2.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0"

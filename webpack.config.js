@@ -1,20 +1,19 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const dotenv = require('dotenv');
 const { dependencies } = require('./package.json');
-const { resolveRoot } = require('./server/utils');
+const path = require('path');
 
-const envFile = dotenv.config();
-const parsedEnv = { ...envFile.parsed };
+const config = { ...dotenv.config().parsed };
 
 module.exports = (env) => {
   const isDev = !!env.dev;
 
   const babelOptions = {
-    presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
+    presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }], '@babel/preset-typescript'],
     plugins: ['@babel/plugin-transform-runtime', '@emotion'],
   };
 
@@ -28,11 +27,13 @@ module.exports = (env) => {
     mode: isDev ? 'development' : 'production',
     devtool: isDev && 'inline-source-map',
     output: {
+      path: resolveRoot('dist'),
+      filename: 'index.js',
       publicPath: 'auto',
       clean: true,
     },
     devServer: {
-      port: parsedEnv.PORT,
+      port: config.PORT,
       static: resolveRoot('dist'),
       historyApiFallback: {
         index: 'index.html',
@@ -48,15 +49,6 @@ module.exports = (env) => {
             {
               loader: 'babel-loader',
               options: babelOptions,
-            },
-          ],
-        },
-        {
-          test: /\.(ts|tsx)?$/,
-          exclude: /node_modules/,
-          use: [
-            {
-              loader: 'ts-loader',
             },
           ],
         },
@@ -79,7 +71,7 @@ module.exports = (env) => {
         },
       }),
       new webpack.DefinePlugin({
-        'process.env': JSON.stringify(parsedEnv),
+        'process.env': JSON.stringify(config),
       }),
       ...devPlugins,
     ],
@@ -91,6 +83,10 @@ module.exports = (env) => {
     },
   };
 };
+
+function resolveRoot(...segments) {
+  return path.resolve(__dirname, ...segments);
+}
 
 function singletonDeps(...deps) {
   return deps.reduce((depsObj, dep) => {
