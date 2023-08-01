@@ -8,8 +8,19 @@
   "scripts": {
     "dev": "webpack serve --env dev",
     "build": "webpack build --progress",
-    "lint": "eslint src --ext ts,tsx --fix",
-    "format": "prettier src --write"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier . --write"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@mantine/core": "^6.0.14",
+    "@mantine/hooks": "^6.0.14",
+    "@mantine/notifications": "^6.0.16",
+    "@module-federation/utilities": "^2.0.0",
+    "compose-function": "^3.0.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.0"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
@@ -41,16 +52,5 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
     "webpack-livereload-plugin": "^3.0.2"
-  },
-  "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@mantine/core": "^6.0.14",
-    "@mantine/hooks": "^6.0.14",
-    "@mantine/notifications": "^6.0.16",
-    "@module-federation/utilities": "^2.0.0",
-    "compose-function": "^3.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.14.0"
   }
 }
