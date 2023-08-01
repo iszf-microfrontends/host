@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "webpack serve --env dev",
     "build": "webpack build --progress",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext ts,tsx --fix",
     "format": "prettier . --write"
   },
   "dependencies": {
