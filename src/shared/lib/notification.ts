@@ -5,10 +5,10 @@ type ShowNotificationOptions = {
   message: string;
 };
 
-const show = (props: NotificationProps) => {
+const showNotification = (props: NotificationProps) => {
   notifications.show({ withBorder: true, ...props });
 };
 
-export const showError = (options: ShowNotificationOptions) => {
-  show({ ...options, color: 'red' });
+export const showErrorNotification = (options: ShowNotificationOptions) => {
+  showNotification({ ...options, color: 'red' });
 };

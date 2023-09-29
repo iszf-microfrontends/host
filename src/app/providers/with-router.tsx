@@ -1,12 +1,15 @@
-import { ComponentType } from 'react';
+import { ComponentType, Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
-export function withRouter(WrappedComponent: ComponentType) {
-  return function wrapper(): JSX.Element | null {
-    return (
-      <BrowserRouter>
+import { Loader } from '@mantine/core';
+
+export const withRouter = (WrappedComponent: ComponentType) => {
+  const RouterWrapper = () => (
+    <BrowserRouter>
+      <Suspense fallback={<Loader className="centered-absolute" />}>
         <WrappedComponent />
-      </BrowserRouter>
-    );
-  };
-}
+      </Suspense>
+    </BrowserRouter>
+  );
+  return RouterWrapper;
+};

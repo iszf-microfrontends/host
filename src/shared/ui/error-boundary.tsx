@@ -9,23 +9,24 @@ type ErrorBoundaryState = {
 };
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public state: ErrorBoundaryState = {
+  state: ErrorBoundaryState = {
     hasError: false,
   };
 
-  public static getDerivedStateFromError(): ErrorBoundaryState {
+  static getDerivedStateFromError(): ErrorBoundaryState {
     return { hasError: true };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught error:', error, errorInfo);
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    if (__DEV__) {
+      console.error('ErrorBoundary caught error:', error, errorInfo);
+    }
   }
 
-  public render() {
+  render() {
     if (this.state.hasError) {
       return <div>Упс... Что то пошло не так &#9785;&#65039;</div>;
     }
-
     return this.props.children;
   }
 }

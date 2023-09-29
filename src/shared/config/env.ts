@@ -1,1 +1,1 @@
-export const MICROFRONTEND_CONTROL_SERVER_URL = process.env.MICROFRONTEND_CONTROL_SERVER_URL ?? '';
+export const MCS_URL = process.env.MCS_URL;

@@ -1,40 +1,43 @@
-import { useEffect } from 'react';
+import { lazy, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Divider, Title } from '@mantine/core';
+import { observer } from 'mobx-react-lite';
 
-import { RemoteComponent, RemoteModule, useRemoteModules } from '~/shared/lib';
-import { Layout } from '~/widgets/layout';
+import { BaseLayout } from '~/layouts/base-layout';
+import { ROUTES } from '~/shared/config';
+import { RemoteComponent, RemoteModule, remoteModuleStore } from '~/shared/lib';
 
-export function Pages(): JSX.Element | null {
-  const { remoteModules, loadRemoteModules } = useRemoteModules();
+const HomePage = lazy(() => import('./home').then((module) => ({ default: module.HomePage })));
 
+export const Pages = observer(() => {
   useEffect(() => {
-    loadRemoteModules();
-  }, [loadRemoteModules]);
+    remoteModuleStore.loadData();
+  }, []);
 
-  const renderRemoteRoutes = (module: RemoteModule): JSX.Element | null =>
-    module.isActive ? (
-      <Route
-        key={module.name}
-        path={module.path}
-        element={
-          <div>
-            <Title>{module.name}</Title>
-            <Divider my="md" />
-            <RemoteComponent url={module.url} scope={module.scope} component={module.component} fallback={<div>Загрузка...</div>} />
-          </div>
-        }
-      />
-    ) : null;
+  const renderRoute = (module: RemoteModule) => (
+    <Route
+      key={module.name}
+      path={module.path}
+      element={
+        <div>
+          <Title>{module.name}</Title>
+          <Divider my="md" />
+          <RemoteComponent url={module.url} scope={module.name} component={module.component} fallback={<div>Загрузка...</div>} />
+        </div>
+      }
+    />
+  );
+
+  const renderRoutes = () => remoteModuleStore.data?.case({ fulfilled: (modules) => <>{modules.map(renderRoute)}</> });
 
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Title>Главная</Title>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-        {remoteModules.map(renderRemoteRoutes)}
+      <Route path={ROUTES.home} element={<BaseLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
+        {renderRoutes()}
       </Route>
     </Routes>
   );
-}
+});

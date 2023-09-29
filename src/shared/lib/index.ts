@@ -1,3 +1,2 @@
-export * from './error-boundary';
-export * as notification from './notification';
-export * from './remote-modules';
+export * from './notification';
+export * from './remote-module';

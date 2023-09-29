@@ -1,11 +1,12 @@
-const webpack = require('webpack');
+const { DefinePlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-const LiveReloadPlugin = require('webpack-livereload-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const dotenv = require('dotenv');
-const { dependencies } = require('./package.json');
 const path = require('path');
+const pkg = require('./package.json');
 
 const config = { ...dotenv.config().parsed };
 
@@ -13,32 +14,27 @@ module.exports = (env) => {
   const isDev = !!env.dev;
 
   const babelOptions = {
-    presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }], '@babel/preset-typescript'],
-    plugins: ['@babel/plugin-transform-runtime', '@emotion'],
+    presets: ['@babel/preset-typescript', ['@babel/preset-react', { runtime: 'automatic' }]],
   };
 
   const devPlugins = [];
   if (isDev) {
-    devPlugins.push(new LiveReloadPlugin());
+    devPlugins.push(new ReactRefreshWebpackPlugin());
   }
 
   return {
-    entry: resolveRoot('src/index'),
+    entry: path.resolve(__dirname, './src/index'),
     mode: isDev ? 'development' : 'production',
-    devtool: isDev && 'inline-source-map',
     output: {
-      path: resolveRoot('dist'),
+      path: path.resolve(__dirname, './dist'),
       filename: 'index.js',
       publicPath: 'auto',
       clean: true,
     },
     devServer: {
       port: config.PORT,
-      static: resolveRoot('dist'),
-      historyApiFallback: {
-        index: 'index.html',
-      },
-      hot: false,
+      historyApiFallback: true,
+      hot: true,
     },
     module: {
       rules: [
@@ -58,42 +54,42 @@ module.exports = (env) => {
       new NodePolyfillPlugin(),
       new ModuleFederationPlugin({
         name: 'HOST',
-        remotes: {},
         shared: {
-          ...dependencies,
-          ...singletonDeps('react', 'react-dom', '@emotion/react', '@mantine/core', '@mantine/hooks', '@mantine/notifications'),
+          ...pkg.dependencies,
+          react: {
+            singleton: true,
+            requiredVersion: pkg.dependencies['react'],
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: pkg.dependencies['react-dom'],
+          },
+          '@emotion/react': {
+            singleton: true,
+          },
+          '@mantine/core': {
+            singleton: true,
+          },
+          '@mantine/hooks': {
+            singleton: true,
+          },
+          '@mantine/notifications': {
+            singleton: true,
+          },
         },
       }),
       new HtmlWebpackPlugin({
-        template: resolveRoot('public/index.html'),
-        templateParameters: {
-          IS_DEV: isDev,
-        },
+        template: path.resolve(__dirname, './public/index.html'),
       }),
-      new webpack.DefinePlugin({
+      new DefinePlugin({
         'process.env': JSON.stringify(config),
+        __DEV__: isDev,
       }),
       ...devPlugins,
     ],
     resolve: {
-      alias: {
-        '~': resolveRoot('src'),
-      },
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      plugins: [new TsconfigPathsPlugin()],
     },
   };
 };
-
-function resolveRoot(...segments) {
-  return path.resolve(__dirname, ...segments);
-}
-
-function singletonDeps(...deps) {
-  return deps.reduce((depsObj, dep) => {
-    depsObj[dep] = {
-      singleton: true,
-      requiredVersion: dependencies[dep],
-    };
-    return depsObj;
-  }, {});
-}
