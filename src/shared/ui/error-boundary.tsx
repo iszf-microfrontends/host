@@ -1,12 +1,12 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 
-type ErrorBoundaryProps = {
+interface ErrorBoundaryProps {
   children?: ReactNode;
-};
+}
 
-type ErrorBoundaryState = {
+interface ErrorBoundaryState {
   hasError: boolean;
-};
+}
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = {
@@ -17,13 +17,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return { hasError: true };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     if (__DEV__) {
       console.error('ErrorBoundary caught error:', error, errorInfo);
     }
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       return <div>Упс... Что то пошло не так &#9785;&#65039;</div>;
     }

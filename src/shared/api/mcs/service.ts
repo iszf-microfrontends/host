@@ -1,7 +1,9 @@
-import { MicrofrontendDto } from './types';
-
 import { HttpRequestService } from '../http';
 
+import { type MicrofrontendDto } from './types';
+
 export class McsService extends HttpRequestService {
-  getAll = () => this.httpClient.get<MicrofrontendDto[]>('microfrontends');
+  async getAll(): Promise<MicrofrontendDto[]> {
+    return this.httpClient.get('microfrontends');
+  }
 }

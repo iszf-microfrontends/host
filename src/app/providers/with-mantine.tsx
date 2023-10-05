@@ -1,7 +1,6 @@
-import { ComponentType } from 'react';
-
-import { MantineProvider, MantineThemeOverride } from '@mantine/core';
+import { MantineProvider, type MantineThemeOverride } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import { type ComponentType } from 'react';
 
 const theme: MantineThemeOverride = {
   globalStyles: () => ({
@@ -16,8 +15,8 @@ const theme: MantineThemeOverride = {
   }),
 };
 
-export const withMantine = (WrappedComponent: ComponentType) => {
-  const MantineWrapper = () => (
+export const withMantine = (WrappedComponent: ComponentType): (() => JSX.Element) => {
+  const MantineWrapper = (): JSX.Element => (
     <MantineProvider theme={theme} withNormalizeCSS>
       <Notifications />
       <WrappedComponent />

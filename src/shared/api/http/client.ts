@@ -1,18 +1,18 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { type AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios';
 
 import {
   BadDataError,
   ConflictError,
   ErrorStatus,
   ForbiddenError,
-  HttpError,
+  type HttpError,
   NotFoundError,
   ServerError,
   UnauthorizedError,
 } from './error';
 
 export class HttpClient {
-  private _axiosInstance: AxiosInstance;
+  private readonly _axiosInstance: AxiosInstance;
 
   constructor(options: { baseURL: string }) {
     this._axiosInstance = axios.create({
@@ -25,10 +25,10 @@ export class HttpClient {
     this._setInterceptors();
   }
 
-  private _setInterceptors = () => {
+  private _setInterceptors(): void {
     this._axiosInstance.interceptors.response.use(
       (res) => res.data,
-      (err: AxiosError) => {
+      async (err: AxiosError) => {
         const status = err.response?.status;
         let error: HttpError | null = null;
         switch (status) {
@@ -53,14 +53,21 @@ export class HttpClient {
         return Promise.reject(error);
       },
     );
-  };
+  }
 
-  get = <Res>(endpoint: string, config?: AxiosRequestConfig): Promise<Res> => this._axiosInstance.get(endpoint, config);
+  async get<Res>(endpoint: string, config?: AxiosRequestConfig): Promise<Res> {
+    return this._axiosInstance.get(endpoint, config);
+  }
 
-  post = <Res, Data = unknown>(url: string, data: Data, config?: AxiosRequestConfig): Promise<Res> =>
-    this._axiosInstance.post(url, data, config);
+  async post<Res, Data = unknown>(url: string, data: Data, config?: AxiosRequestConfig): Promise<Res> {
+    return this._axiosInstance.post(url, data, config);
+  }
 
-  delete = <Res>(url: string, config?: AxiosRequestConfig): Promise<Res> => this._axiosInstance.delete(url, config);
+  async delete<Res>(url: string, config?: AxiosRequestConfig): Promise<Res> {
+    return this._axiosInstance.delete(url, config);
+  }
 
-  put = <Res, Data>(url: string, data: Data, config?: AxiosRequestConfig): Promise<Res> => this._axiosInstance.put(url, data, config);
+  async put<Res, Data>(url: string, data: Data, config?: AxiosRequestConfig): Promise<Res> {
+    return this._axiosInstance.put(url, data, config);
+  }
 }

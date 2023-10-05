@@ -1,3 +1,3 @@
 import { Title } from '@mantine/core';
 
-export const HomePage = () => <Title>Главная</Title>;
+export const HomePage = (): JSX.Element => <Title>Главная</Title>;

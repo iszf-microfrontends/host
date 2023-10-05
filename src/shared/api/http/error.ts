@@ -11,7 +11,7 @@ export class HttpError {
   constructor(public status: ErrorStatus) {}
 }
 
-const createError = (status: ErrorStatus) =>
+const createError = (status: ErrorStatus): new () => HttpError =>
   class extends HttpError {
     constructor() {
       super(status);

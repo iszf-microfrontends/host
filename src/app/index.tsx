@@ -1,7 +1,7 @@
-import { withProviders } from './providers';
-
 import { Pages } from '../pages';
 
-const App = () => <Pages />;
+import { withProviders } from './providers';
+
+const App = (): JSX.Element => <Pages />;
 
 export const AppWithProviders = withProviders(App);

@@ -1,14 +1,14 @@
-import { NotificationProps, notifications } from '@mantine/notifications';
+import { type NotificationProps, notifications } from '@mantine/notifications';
 
-type ShowNotificationOptions = {
+interface ShowNotificationOptions {
   title?: string;
   message: string;
-};
+}
 
-const showNotification = (props: NotificationProps) => {
+const showNotification = (props: NotificationProps): void => {
   notifications.show({ withBorder: true, ...props });
 };
 
-export const showErrorNotification = (options: ShowNotificationOptions) => {
+export const showErrorNotification = (options: ShowNotificationOptions): void => {
   showNotification({ ...options, color: 'red' });
 };

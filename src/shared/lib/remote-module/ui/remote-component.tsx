@@ -1,18 +1,17 @@
-import { lazy, ReactNode, Suspense } from 'react';
-
 import { importRemote } from '@module-federation/utilities';
+import { lazy, type ReactNode, Suspense } from 'react';
 
 import { ErrorBoundary } from '~/shared/ui';
 
-type RemoteComponentProps = {
+interface RemoteComponentProps {
   url: string;
   scope: string;
   component: string;
   fallback?: string | ReactNode;
-};
+}
 
-export const RemoteComponent = ({ url, scope, component, fallback }: RemoteComponentProps) => {
-  const Component = lazy(() =>
+export const RemoteComponent = ({ url, scope, component, fallback }: RemoteComponentProps): JSX.Element => {
+  const Component = lazy(async () =>
     importRemote({
       url,
       scope,

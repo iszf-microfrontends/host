@@ -64,18 +64,6 @@ module.exports = (env) => {
             singleton: true,
             requiredVersion: pkg.dependencies['react-dom'],
           },
-          '@emotion/react': {
-            singleton: true,
-          },
-          '@mantine/core': {
-            singleton: true,
-          },
-          '@mantine/hooks': {
-            singleton: true,
-          },
-          '@mantine/notifications': {
-            singleton: true,
-          },
         },
       }),
       new HtmlWebpackPlugin({

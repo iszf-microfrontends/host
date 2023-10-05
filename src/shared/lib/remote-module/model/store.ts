@@ -1,18 +1,18 @@
 import { makeAutoObservable, when } from 'mobx';
-import { fromPromise, IPromiseBasedObservable } from 'mobx-utils';
+import { fromPromise, type IPromiseBasedObservable } from 'mobx-utils';
 
 import { api } from '~/shared/api';
 
-import { RemoteModule } from './types';
-
 import { showErrorNotification } from '../../notification';
 import { transformToEntity } from '../lib';
+
+import { type RemoteModule } from './types';
 
 class RemoteModuleStore {
   data: IPromiseBasedObservable<RemoteModule[]> | null = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {}, { autoBind: true });
 
     when(
       () => this.data?.state === 'rejected',
@@ -22,9 +22,9 @@ class RemoteModuleStore {
     );
   }
 
-  loadData = () => {
+  loadData(): void {
     this.data = fromPromise(api.mcsService.getAll().then((mfs) => mfs.map(transformToEntity)));
-  };
+  }
 }
 
 export const remoteModuleStore = new RemoteModuleStore();

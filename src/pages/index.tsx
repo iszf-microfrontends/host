@@ -1,21 +1,20 @@
+import { Divider, Title } from '@mantine/core';
+import { observer } from 'mobx-react-lite';
 import { lazy, useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { Divider, Title } from '@mantine/core';
-import { observer } from 'mobx-react-lite';
-
 import { BaseLayout } from '~/layouts/base-layout';
 import { ROUTES } from '~/shared/config';
-import { RemoteComponent, RemoteModule, remoteModuleStore } from '~/shared/lib';
+import { RemoteComponent, type RemoteModule, remoteModuleStore } from '~/shared/lib';
 
-const HomePage = lazy(() => import('./home').then((module) => ({ default: module.HomePage })));
+const HomePage = lazy(async () => import('./home').then((module) => ({ default: module.HomePage })));
 
 export const Pages = observer(() => {
   useEffect(() => {
     remoteModuleStore.loadData();
   }, []);
 
-  const renderRoute = (module: RemoteModule) => (
+  const renderRoute = (module: RemoteModule): JSX.Element => (
     <Route
       key={module.name}
       path={module.path}
@@ -29,7 +28,7 @@ export const Pages = observer(() => {
     />
   );
 
-  const renderRoutes = () => remoteModuleStore.data?.case({ fulfilled: (modules) => <>{modules.map(renderRoute)}</> });
+  const renderRoutes = (): JSX.Element => <>{remoteModuleStore.data?.case({ fulfilled: (modules) => <>{modules.map(renderRoute)}</> })}</>;
 
   return (
     <Routes>

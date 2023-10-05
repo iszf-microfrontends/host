@@ -1,19 +1,18 @@
-import { ReactNode } from 'react';
-import { NavLink } from 'react-router-dom';
-
 import { Navbar as MantineNavbar, Stack, Text, Tooltip } from '@mantine/core';
 import { observer } from 'mobx-react-lite';
+import { type ReactNode } from 'react';
+import { NavLink } from 'react-router-dom';
 
-import { RemoteModule, remoteModuleStore } from '~/shared/lib';
+import { type RemoteModule, remoteModuleStore } from '~/shared/lib';
 
 import { useStyles } from './styles';
 
-type NavbarLinkProps = {
+interface NavbarLinkProps {
   to: string;
   children: ReactNode;
-};
+}
 
-const NavbarLink = ({ to, children }: NavbarLinkProps) => {
+const NavbarLink = ({ to, children }: NavbarLinkProps): JSX.Element => {
   const { classes, cx } = useStyles();
   return (
     <NavLink to={to} className={({ isActive }) => cx(classes.link, { [classes.linkActive]: isActive })}>
@@ -25,7 +24,7 @@ const NavbarLink = ({ to, children }: NavbarLinkProps) => {
 export const Navbar = observer(() => {
   const { classes } = useStyles();
 
-  const renderLink = (module: RemoteModule) =>
+  const renderLink = (module: RemoteModule): JSX.Element =>
     module.isActive ? (
       <NavbarLink key={module.name} to={module.path}>
         {module.name}
@@ -36,8 +35,9 @@ export const Navbar = observer(() => {
       </Tooltip>
     );
 
-  const renderLinks = () =>
-    remoteModuleStore.data?.case({ pending: () => <div>Загрузка...</div>, fulfilled: (modules) => <>{modules.map(renderLink)}</> });
+  const renderLinks = (): JSX.Element => (
+    <>{remoteModuleStore.data?.case({ pending: () => <div>Загрузка...</div>, fulfilled: (modules) => <>{modules.map(renderLink)}</> })}</>
+  );
 
   return (
     <MantineNavbar width={{ base: 300 }} h="100%" p="md">
