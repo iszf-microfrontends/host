@@ -1,50 +1,52 @@
-const { DefinePlugin } = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const dotenv = require('dotenv');
 const path = require('path');
-const pkg = require('./package.json');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const { DefinePlugin } = require('webpack');
+const { dependencies: deps } = require('./package.json');
 
-const config = { ...dotenv.config().parsed };
+const envConfig = { ...dotenv.config({ path: `.env.${process.env.NODE_ENV}` }).parsed };
 
-module.exports = (env) => {
-  const isDev = !!env.dev;
+module.exports = () => {
+  const isDev = process.env.NODE_ENV === 'development';
 
   const babelOptions = {
-    presets: ['@babel/preset-typescript', ['@babel/preset-react', { runtime: 'automatic' }]],
+    plugins: [isDev && require.resolve('react-refresh/babel')].filter(Boolean),
+    presets: [['@babel/preset-react', { runtime: 'automatic' }], '@babel/preset-typescript'],
   };
 
   const devPlugins = [];
   if (isDev) {
-    devPlugins.push(new ReactRefreshWebpackPlugin());
+    devPlugins.push(
+      new ReactRefreshWebpackPlugin({
+        exclude: [/node_modules/, /bootstrap\.tsx$/],
+      }),
+    );
   }
 
   return {
-    entry: path.resolve(__dirname, './src/index'),
+    target: 'web',
+    entry: './src/index',
     mode: isDev ? 'development' : 'production',
+    devtool: isDev ? 'inline-source-map' : 'source-map',
+    devServer: {
+      hot: true,
+      static: path.join(__dirname, 'dist'),
+      port: envConfig.PORT,
+      liveReload: false,
+      historyApiFallback: true,
+    },
     output: {
-      path: path.resolve(__dirname, './dist'),
-      filename: 'index.js',
       publicPath: 'auto',
       clean: true,
-    },
-    devServer: {
-      port: config.PORT,
-      historyApiFallback: true,
-      hot: true,
-    },
-    performance: {
-      hints: false,
-      maxEntrypointSize: 512000,
-      maxAssetSize: 512000,
     },
     module: {
       rules: [
         {
-          test: /\.(js|jsx|ts|tsx)?$/,
+          test: /\.(ts|tsx)?$/,
           exclude: /node_modules/,
           use: [
             {
@@ -58,24 +60,27 @@ module.exports = (env) => {
     plugins: [
       new NodePolyfillPlugin(),
       new ModuleFederationPlugin({
-        name: 'HOST',
+        name: envConfig.APP_NAME,
         shared: {
-          ...pkg.dependencies,
+          ...deps,
           react: {
             singleton: true,
-            requiredVersion: pkg.dependencies['react'],
+            requiredVersion: deps['react'],
           },
           'react-dom': {
             singleton: true,
-            requiredVersion: pkg.dependencies['react-dom'],
+            requiredVersion: deps['react-dom'],
           },
         },
       }),
       new HtmlWebpackPlugin({
-        template: path.resolve(__dirname, './public/index.html'),
+        template: './public/index.html',
+        templateParameters: {
+          title: envConfig.APP_NAME,
+        },
       }),
       new DefinePlugin({
-        'process.env': JSON.stringify(config),
+        'process.env': JSON.stringify(envConfig),
         __DEV__: isDev,
       }),
       ...devPlugins,

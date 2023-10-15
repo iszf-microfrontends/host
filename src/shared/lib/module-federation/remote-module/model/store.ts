@@ -2,8 +2,8 @@ import { makeAutoObservable, when } from 'mobx';
 import { fromPromise, type IPromiseBasedObservable } from 'mobx-utils';
 
 import { api } from '~/shared/api';
+import { showErrorNotification } from '~/shared/lib/notification';
 
-import { showErrorNotification } from '../../notification';
 import { transformToEntity } from '../lib';
 
 import { type RemoteModule } from './types';

@@ -1,2 +1,2 @@
 export * from './notification';
-export * from './remote-module';
+export * from './module-federation';
