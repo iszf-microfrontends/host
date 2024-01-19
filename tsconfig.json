@@ -22,8 +22,13 @@
 
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"]
-    }
+      "~/*": ["src/*"],
+    },
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+      },
+    ],
   },
-  "include": ["src"]
+  "include": ["src"],
 }

@@ -1,8 +1,8 @@
 module.exports = {
   root: true,
-  extends: ['@iszf-microfrontends/eslint-config'],
+  extends: ['@iszf-microfrontends/eslint-config/react-effector'],
   plugins: ['react-refresh'],
-  ignorePatterns: ['dist', 'webpack.config.js', '.eslintrc.js'],
+  ignorePatterns: ['dist', '.eslintrc.js', 'webpack.config.js', 'postcss.config.js'],
   rules: {
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
   },

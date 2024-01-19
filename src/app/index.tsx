@@ -1,7 +1,21 @@
-import { Pages } from '../pages';
+import { Suspense, type FC } from 'react';
 
-import { withProviders } from './providers';
+import { Loader, Center, MantineProvider } from '@mantine/core';
 
-const App = (): JSX.Element => <Pages />;
+import { Pages } from '~/pages';
 
-export const AppWithProviders = withProviders(App);
+const App: FC = () => <Pages />;
+
+export const AppWithProviders: FC = () => (
+  <MantineProvider>
+    <Suspense
+      fallback={
+        <Center maw="100%" mih="100vh">
+          <Loader />
+        </Center>
+      }
+    >
+      <App />
+    </Suspense>
+  </MantineProvider>
+);
