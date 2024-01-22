@@ -1,28 +1,36 @@
 import { createHistoryRouter, createRoute, createRouterControls } from 'atomic-router';
-import { createEvent, sample } from 'effector';
+import { sample } from 'effector';
 import { createBrowserHistory } from 'history';
+
+import { appStarted } from '../config/init';
 
 export type RouteType = ReturnType<typeof createRoute>;
 
-export const routeMap = {
+const routeMap = {
   index: createRoute(),
+  service: createRoute<{ serviceId: string }>(),
 };
 
-export const routerControls = createRouterControls();
+const controls = createRouterControls();
 
-export const router = createHistoryRouter({
+const router = createHistoryRouter({
   routes: [
     {
       path: '/',
       route: routeMap.index,
     },
+    {
+      path: '/services/:serviceId',
+      route: routeMap.service,
+    },
   ],
+  controls,
 });
 
-export const routerInitialized = createEvent();
-
 sample({
-  clock: routerInitialized,
+  clock: appStarted,
   fn: () => createBrowserHistory(),
   target: router.setHistory,
 });
+
+export const routingModel = { router, controls, routeMap };

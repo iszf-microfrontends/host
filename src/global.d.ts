@@ -17,3 +17,5 @@ declare const __DEV__: boolean;
 declare module '*.css' {
   export default Record<string, string>;
 }
+
+declare module '*.png';

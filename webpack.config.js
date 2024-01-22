@@ -7,6 +7,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const { DefinePlugin } = require('webpack');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { dependencies: deps } = require('./package.json');
 
 const { NODE_ENV } = process.env;
@@ -31,6 +32,7 @@ module.exports = () => {
       ['@babel/preset-react', { runtime: 'automatic' }],
       '@babel/preset-typescript',
       'atomic-router/babel-preset',
+      'patronum/babel-preset',
     ],
   };
 
@@ -53,27 +55,37 @@ module.exports = () => {
     module: {
       rules: [
         {
-          test: /\.css$/i,
-          use: ['style-loader', 'css-loader', 'postcss-loader'],
-          exclude: /\.module\.css$/,
+          test: /\.(png|svg|jpg|jpeg|gif)$/,
+          type: 'asset/resource',
         },
         {
-          test: /\.css$/i,
-          use: [
-            'style-loader',
+          test: /\.json$/,
+          type: 'json',
+        },
+        {
+          test: /\.css$/,
+          oneOf: [
             {
-              loader: 'css-loader',
-              options: {
-                importLoaders: 1,
-                modules: true,
-              },
+              test: /\.module\.css$/,
+              use: [
+                MiniCssExtractPlugin.loader,
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                    modules: true,
+                  },
+                },
+                'postcss-loader',
+              ],
             },
-            'postcss-loader',
+            {
+              use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+            },
           ],
-          include: /\.module\.css$/,
         },
         {
-          test: /\.(ts|tsx)?$/,
+          test: /\.(ts|tsx)$/,
           exclude: /node_modules/,
           use: [
             {
@@ -85,6 +97,7 @@ module.exports = () => {
       ],
     },
     plugins: [
+      new MiniCssExtractPlugin(),
       new NodePolyfillPlugin(),
       new ModuleFederationPlugin({
         name: envConfig.APP_NAME,
@@ -97,21 +110,6 @@ module.exports = () => {
             singleton: true,
             requiredVersion: deps['react-dom'],
           },
-          // '@mantine/core': {
-          //   singleton: true,
-          // },
-          // '@mantine/hooks': {
-          //   singleton: true,
-          // },
-          // '@mantine/notifications': {
-          //   singleton: true,
-          // },
-          // effector: {
-          //   singleton: true,
-          // },
-          // 'effector-react': {
-          //   singleton: true,
-          // },
         },
       }),
       new HtmlWebpackPlugin({
