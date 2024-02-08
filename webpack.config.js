@@ -12,30 +12,12 @@ const { dependencies: deps } = require('./package.json');
 
 const { NODE_ENV } = process.env;
 
-const envConfig = { ...dotenv.config({ path: `.env.${NODE_ENV.split('-')[0]}` }).parsed };
-
 const isDev = NODE_ENV === 'development';
-const isAnalyze = NODE_ENV === 'production-analyze';
+const isAnalyze = NODE_ENV === 'analyze';
+
+const envConfig = { ...dotenv.config({ path: `.env.${isAnalyze ? 'production' : NODE_ENV}` }).parsed };
 
 module.exports = () => {
-  const devPlugins = [
-    new ReactRefreshWebpackPlugin({
-      exclude: [/node_modules/, /bootstrap\.tsx$/],
-    }),
-  ];
-
-  const analyzePlugins = [new BundleAnalyzerPlugin()];
-
-  const babelOptions = {
-    plugins: [isDev && require.resolve('react-refresh/babel')].filter(Boolean),
-    presets: [
-      ['@babel/preset-react', { runtime: 'automatic' }],
-      '@babel/preset-typescript',
-      'atomic-router/babel-preset',
-      'patronum/babel-preset',
-    ],
-  };
-
   return {
     target: 'web',
     entry: './src/index',
@@ -90,7 +72,10 @@ module.exports = () => {
           use: [
             {
               loader: 'babel-loader',
-              options: babelOptions,
+              options: {
+                plugins: [isDev && require.resolve('react-refresh/babel')].filter(Boolean),
+                presets: [['@babel/preset-react', { runtime: 'automatic' }], '@babel/preset-typescript'],
+              },
             },
           ],
         },
@@ -122,10 +107,12 @@ module.exports = () => {
         'process.env': JSON.stringify(envConfig),
         __DEV__: isDev,
       }),
-    ]
-      .concat(isDev && devPlugins)
-      .concat(isAnalyze && analyzePlugins)
-      .filter(Boolean),
+      isDev &&
+        new ReactRefreshWebpackPlugin({
+          exclude: [/node_modules/, /bootstrap\.tsx$/],
+        }),
+      isAnalyze && new BundleAnalyzerPlugin(),
+    ].filter(Boolean),
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       plugins: [new TsconfigPathsPlugin()],

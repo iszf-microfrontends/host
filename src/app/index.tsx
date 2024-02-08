@@ -1,25 +1,33 @@
-import { Suspense, type FC } from 'react';
-
 import { Center, Loader, MantineProvider } from '@mantine/core';
-import { RouterProvider } from 'atomic-router-react';
+import { Notifications } from '@mantine/notifications';
+import { Suspense, type FC } from 'react';
+import { BrowserRouter } from 'react-router-dom';
 
 import { Pages } from '~/pages';
-import { routingModel } from '~/shared/routing';
 
-const GlobalLoader: FC = () => (
-  <Center maw="100%" mih="100vh">
-    <Loader />
-  </Center>
-);
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const App: FC = () => <Pages />;
 
+const queryClient = new QueryClient();
+
 export const AppWithProviders: FC = () => (
-  <RouterProvider router={routingModel.router}>
-    <MantineProvider>
-      <Suspense fallback={<GlobalLoader />}>
-        <App />
-      </Suspense>
+  <BrowserRouter>
+    <MantineProvider withCssVariables>
+      <Notifications />
+      <QueryClientProvider client={queryClient}>
+        <Suspense
+          fallback={
+            <Center maw="100%" mih="100vh">
+              <Loader />
+            </Center>
+          }
+        >
+          <App />
+        </Suspense>
+      </QueryClientProvider>
     </MantineProvider>
-  </RouterProvider>
+  </BrowserRouter>
 );
